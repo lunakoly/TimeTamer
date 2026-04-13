@@ -16,3 +16,5 @@ plugins {
 }
 
 rootProject.name = "TimerTamer"
+
+include("model")
