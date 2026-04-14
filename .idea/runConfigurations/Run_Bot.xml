@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run Bot" type="JetRunConfigurationType">
+    <option name="MAIN_CLASS_NAME" value="org.lunakoly.timetamer.MainKt" />
+    <module name="TimerTamer.main" />
+    <shortenClasspath name="NONE" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

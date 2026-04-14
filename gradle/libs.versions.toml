@@ -1,9 +1,13 @@
 [versions]
 kotlin = "2.3.10"
 kotlinx-datetime-version = "0.7.1-0.6.x-compat"
+dotenv-version = "6.5.1"
+tgbotapi-version = "32.0.0"
 
 [libraries]
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-datetime-version" }
+dotenv = { group = "io.github.cdimascio", name = "dotenv-kotlin", version.ref = "dotenv-version" }
+tgbotapi = { group = "dev.inmo", name = "tgbotapi", version.ref = "tgbotapi-version" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
