@@ -12,6 +12,7 @@ import dev.inmo.tgbotapi.types.message.abstracts.ContentMessage
 import dev.inmo.tgbotapi.types.message.content.MessageContent
 import dev.inmo.tgbotapi.types.message.content.TextContent
 import io.github.cdimascio.dotenv.dotenv
+import org.lunakoly.timetamer.env.parseEnvironment
 import org.lunakoly.timetamer.parsing.CompositeTimerFinder
 
 context(bot: TelegramBot)
@@ -31,8 +32,8 @@ suspend fun quote(message: AccessibleMessage, text: String, quote: String) {
 }
 
 suspend fun main() {
-    val dotenv = dotenv()
-    val bot = telegramBot(dotenv["BOT_TOKEN"])
+    val environment = dotenv().parseEnvironment()
+    val bot = telegramBot(environment.BOT_TOKEN)
 
     bot.buildBehaviourWithLongPolling {
         onContentMessage { message ->
