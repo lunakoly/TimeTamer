@@ -9,5 +9,5 @@ object UserTable : LongIdTable("user") {
 
 object ChatMemberTable : LongIdTable("chat_member") {
     val chatId = long("telegram_chat_id")
-    val notifiableMemberId = long("notifiable_member_id").references(UserTable.id)
+    val notifiableMemberId = long("notifiable_member_id").references(UserTable.telegramUserId)
 }
