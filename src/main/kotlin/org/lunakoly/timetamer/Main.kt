@@ -55,7 +55,7 @@ fun BehaviourContext.configurePrivateChats() {
         reply(it, "Hey! What's your timezone?")
     }
 
-    onCommand("delete-me", initialFilter = { it.chat is PrivateChat }) {
+    onCommand("delete_me", initialFilter = { it.chat is PrivateChat }) {
         @OptIn(RiskFeature::class)
         val userId = it.from ?: return@onCommand
 
