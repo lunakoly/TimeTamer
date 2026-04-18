@@ -9,6 +9,9 @@ import org.lunakoly.timetamer.util.wrapExceptions
 @Serializable
 data class Environment(
     val BOT_TOKEN: String,
+    val DB_URL: String,
+    val DB_USER: String,
+    val DB_PASSWORD: String,
 )
 
 fun Dotenv.parseEnvironment(): Environment =

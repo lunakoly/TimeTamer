@@ -10,6 +10,9 @@ dependencies {
     implementation(libs.dotenv)
     implementation(libs.kotlinx.datetime)
     implementation(libs.tgbotapi)
+    implementation(libs.kotlin.exposed.core)
+    implementation(libs.kotlin.exposed.jdbc)
+    implementation(libs.sqlite.jdbc)
 
     implementation(project(":model"))
 

@@ -3,7 +3,9 @@ package org.lunakoly.timetamer.parsing
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toKotlinTimeZone
 import kotlinx.datetime.toLocalDateTime
+import java.time.ZoneId
 import kotlin.time.Clock
 
 val zone = TimeZone.of("Europe/Nicosia")
@@ -27,3 +29,6 @@ fun LocalTime.formatTime(zone: TimeZone): String {
 
     return "$hour12:${m.toString().padStart(2, '0')} $ampm"
 }
+
+fun String.toKotlinTimeZone(): TimeZone? =
+    runCatching { ZoneId.of(this) }.getOrNull()?.toKotlinTimeZone()

@@ -1,13 +1,18 @@
 [versions]
 kotlin = "2.3.10"
 kotlinx-datetime-version = "0.7.1-0.6.x-compat"
+kotlin-exposed = "1.2.0"
 dotenv-version = "6.5.1"
 tgbotapi-version = "32.0.0"
+sqlite-jdbc-version = "3.53.0.0"
 
 [libraries]
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-datetime-version" }
+kotlin-exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "kotlin-exposed" }
+kotlin-exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "kotlin-exposed" }
 dotenv = { group = "io.github.cdimascio", name = "dotenv-kotlin", version.ref = "dotenv-version" }
 tgbotapi = { group = "dev.inmo", name = "tgbotapi", version.ref = "tgbotapi-version" }
+sqlite-jdbc = { group = "org.xerial", name = "sqlite-jdbc", version.ref = "sqlite-jdbc-version" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
