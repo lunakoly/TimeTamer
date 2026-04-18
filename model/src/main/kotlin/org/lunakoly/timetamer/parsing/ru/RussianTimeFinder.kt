@@ -25,7 +25,7 @@ object RussianTimeFinder : RegexBasedTimeFinder {
         }
 
         val correction = when {
-            prefix == "утром" || prefix == "ночью" || suffix == "утра" || suffix == "ночи" -> 0
+            hour > 12 || prefix == "утром" || prefix == "ночью" || suffix == "утра" || suffix == "ночи" -> 0
             else -> 12
         }
         val result = LocalTime(hour + correction, minute ?: 0)

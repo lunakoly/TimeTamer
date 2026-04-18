@@ -21,7 +21,7 @@ object EnglishTimeFinder : RegexBasedTimeFinder {
 
         val correction = when {
             prefixAt == "" && suffix == "" -> return null
-            suffix != "am" -> 12
+            hour <= 12 && suffix != "am" -> 12
             else -> 0
         }
         val result = LocalTime(hour + correction, minute ?: 0)

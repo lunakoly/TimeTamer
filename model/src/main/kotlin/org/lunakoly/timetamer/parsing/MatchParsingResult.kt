@@ -8,8 +8,11 @@ import kotlin.time.Clock
 
 val zone = TimeZone.of("Europe/Nicosia")
 
+fun LocalTime.toGlobal(zone: TimeZone): LocalDateTime =
+    LocalDateTime(Clock.System.now().toLocalDateTime(zone).date, this)
+
 fun LocalTime.formatTime(zone: TimeZone): String {
-    val local = LocalDateTime(Clock.System.now().toLocalDateTime(zone).date, this)
+    val local = toGlobal(zone)
 
     val h = local.hour
     val m = local.minute
