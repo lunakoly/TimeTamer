@@ -14,6 +14,7 @@ dependencies {
     implementation(libs.kotlin.exposed.core)
     implementation(libs.kotlin.exposed.jdbc)
     implementation(libs.sqlite.jdbc)
+    implementation(libs.postgresql.driver)
 
     implementation(project(":model"))
 

@@ -5,6 +5,7 @@ kotlin-exposed = "1.2.0"
 dotenv-version = "6.5.1"
 tgbotapi-version = "32.0.0"
 sqlite-jdbc-version = "3.53.0.0"
+postgresql-driver-version = "42.7.10"
 
 [libraries]
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-datetime-version" }
@@ -13,6 +14,7 @@ kotlin-exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.r
 dotenv = { group = "io.github.cdimascio", name = "dotenv-kotlin", version.ref = "dotenv-version" }
 tgbotapi = { group = "dev.inmo", name = "tgbotapi", version.ref = "tgbotapi-version" }
 sqlite-jdbc = { group = "org.xerial", name = "sqlite-jdbc", version.ref = "sqlite-jdbc-version" }
+postgresql-driver = { group = "org.postgresql", name = "postgresql", version.ref = "postgresql-driver-version" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
