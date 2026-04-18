@@ -19,7 +19,6 @@ import dev.inmo.tgbotapi.types.chat.PrivateChat
 import dev.inmo.tgbotapi.types.message.MarkdownParseMode
 import dev.inmo.tgbotapi.types.message.abstracts.AccessibleMessage
 import dev.inmo.tgbotapi.utils.RiskFeature
-import io.github.cdimascio.dotenv.dotenv
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.v1.core.JoinType
@@ -167,7 +166,7 @@ fun BehaviourContext.configurePublicChats() {
 }
 
 suspend fun main() {
-    val environment = dotenv().parseEnvironment()
+    val environment = parseEnvironment()
     val bot = telegramBot(environment.BOT_TOKEN)
 
     Database.connect(

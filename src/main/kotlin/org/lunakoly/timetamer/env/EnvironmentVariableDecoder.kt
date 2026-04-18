@@ -10,7 +10,7 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializer
 
 @OptIn(ExperimentalSerializationApi::class)
-class MapDecoder(private val map: Map<String, String>) : AbstractDecoder() {
+class EnvironmentVariableDecoder : AbstractDecoder() {
     override val serializersModule: SerializersModule = EmptySerializersModule()
 
     private lateinit var descriptor: SerialDescriptor
@@ -24,7 +24,7 @@ class MapDecoder(private val map: Map<String, String>) : AbstractDecoder() {
     }
 
     private val currentName: String get() = descriptor.getElementName(index - 1)
-    private val currentValue: String? get() = map[descriptor.getElementName(index - 1)]
+    private val currentValue: String? get() = System.getenv(descriptor.getElementName(index - 1))
 
     override fun decodeString(): String =
         currentValue ?: throw SerializationException("Missing value for $currentName")
@@ -38,5 +38,5 @@ class MapDecoder(private val map: Map<String, String>) : AbstractDecoder() {
             ?: throw SerializationException("Missing or invalid Boolean for $currentName")
 }
 
-inline fun <reified T> decodeFromMap(map: Map<String, String>): T =
-    serializer<T>().deserialize(MapDecoder(map))
+inline fun <reified T> decodeFromSystemProperties(): T =
+    serializer<T>().deserialize(EnvironmentVariableDecoder())
