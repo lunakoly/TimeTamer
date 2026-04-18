@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlinx.serialization)
+    application
 }
 
 group = "org.lunakoly.timetamer"
@@ -29,4 +30,8 @@ kotlin {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+application {
+    mainClass.set("org.lunakoly.timetamer.MainKt")
 }
