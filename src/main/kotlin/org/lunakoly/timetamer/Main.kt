@@ -85,7 +85,7 @@ fun BehaviourContext.configurePrivateChats() {
             }
         }
 
-        reply(message, "Done! Send another one to update or `/delete-me` to remove your data.")
+        reply(message, "Done! Send another one to update or `/delete_me` to remove your data.")
     }
 }
 
