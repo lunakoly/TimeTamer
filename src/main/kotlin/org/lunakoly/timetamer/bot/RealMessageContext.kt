@@ -1,0 +1,55 @@
+package org.lunakoly.timetamer.bot
+
+import dev.inmo.tgbotapi.bot.TelegramBot
+import dev.inmo.tgbotapi.extensions.api.chat.members.getChatMember
+import dev.inmo.tgbotapi.extensions.api.send.reply
+import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
+import dev.inmo.tgbotapi.extensions.utils.extensions.isLeftOrKicked
+import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
+import dev.inmo.tgbotapi.types.ChatId
+import dev.inmo.tgbotapi.types.IdChatIdentifier
+import dev.inmo.tgbotapi.types.RawChatId
+import dev.inmo.tgbotapi.types.chat.User
+import dev.inmo.tgbotapi.types.message.ParseMode
+import dev.inmo.tgbotapi.types.message.abstracts.CommonMessage
+import dev.inmo.tgbotapi.utils.RiskFeature
+import org.lunakoly.timetamer.api.MessageContext
+import org.lunakoly.timetamer.quote
+
+class RealMessageContext(
+    val message: CommonMessage<*>,
+    val user: User,
+    val telegramBot: TelegramBot,
+) : MessageContext() {
+    val chat: IdChatIdentifier get() = message.chat.id
+
+    override val userId: Long get() = user.id.chatId.long
+    override val chatId: Long get() = chat.chatId.long
+
+    override suspend fun reply(
+        text: String,
+        parseMode: ParseMode?,
+        quote: String?,
+    ) {
+        with(telegramBot) {
+            when (quote) {
+                null -> reply(message, text, parseMode = parseMode)
+                else -> quote(message, text, quote)
+            }
+        }
+    }
+
+    override suspend fun isChatMember(userId: Long): Boolean {
+        val wrappedUserId = ChatId(RawChatId(userId))
+        return !telegramBot.getChatMember(chat, wrappedUserId).isLeftOrKicked
+    }
+}
+
+fun BehaviourContext.createContextFor(message: CommonMessage<*>): RealMessageContext? {
+    @OptIn(RiskFeature::class)
+    return RealMessageContext(
+        message = message,
+        user = message.from ?: return null,
+        telegramBot = this,
+    )
+}
