@@ -50,23 +50,42 @@ suspend fun quote(message: AccessibleMessage, text: String, quote: String) {
     bot.execute(request)
 }
 
+val String.isCommand: Boolean get() = trimStart().startsWith("/")
+
 fun BehaviourContext.configurePrivateChats() {
     onCommand("start", initialFilter = { it.chat is PrivateChat }) {
-        reply(it, "Hey! What's your timezone?")
+        reply(
+            it,
+            "Hey! What's your timezone?\n" +
+                    "Use the *TZ identifier* column from " +
+                    "[this Wikipedia table](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List) " +
+                    "as the reference",
+            parseMode = MarkdownParseMode,
+        )
     }
 
     onCommand("delete_me", initialFilter = { it.chat is PrivateChat }) {
         @OptIn(RiskFeature::class)
         val userId = it.from ?: return@onCommand
 
-        transaction {
-            UserTable.deleteWhere { UserTable.id eq userId.id.chatId.long }
+        val userExists = transaction {
+            val userIdLong = userId.id.chatId.long
+            val userExists = userExists(userIdLong)
+            if (userExists) {
+                UserTable.deleteWhere { UserTable.telegramUserId eq userIdLong }
+            }
+            userExists
         }
 
-        reply(it, "Done! Send your timezone when you're ready!")
+        val response = when (userExists) {
+            true -> "Done! Send your timezone when you're ready!"
+            false -> "I don't even know you anyway :)"
+        }
+        reply(it, response)
     }
 
-    onContentMessage(initialFilter = { it.chat is PrivateChat }) { message ->
+    @OptIn(RiskFeature::class)
+    onContentMessage(initialFilter = { it.chat is PrivateChat && it.text?.isCommand != true }) { message ->
         @OptIn(RiskFeature::class)
         val text = message.text ?: return@onContentMessage
 
@@ -85,8 +104,28 @@ fun BehaviourContext.configurePrivateChats() {
             }
         }
 
-        reply(message, "Done! Send another one to update or `/delete_me` to remove your data.")
+        reply(message, "Done! Send another one to update or /delete_me to remove your data.")
     }
+}
+
+fun userExists(userId: Long): Boolean = UserTable.selectAll()
+     .where { UserTable.telegramUserId eq userId }
+     .singleOrNull() != null
+
+fun chatEntryExists(chatId: Long, userId: Long): Boolean = ChatMemberTable.selectAll()
+    .where { (ChatMemberTable.chatId eq chatId) and (ChatMemberTable.notifiableMemberId eq userId) }
+    .singleOrNull() != null
+
+enum class TranslateForMeRequestResult {
+    SUCCESS,
+    ALREADY_LISTENING,
+    UNKNOWN_USER,
+}
+
+enum class StopTranslatingForMeRequestResult {
+    SUCCESS,
+    NOT_LISTENING,
+    UNKNOWN_USER,
 }
 
 fun BehaviourContext.configurePublicChats() {
@@ -95,14 +134,32 @@ fun BehaviourContext.configurePublicChats() {
         val userId = message.from ?: return@onCommand
         val chatId = message.chat.id
 
-        transaction {
+        val result = transaction {
+            val relatedChatId = chatId.chatId.long
+            val notifiableUserId = userId.id.chatId.long
+
+            val userExists = userExists(notifiableUserId)
+            val chatEntryExists = chatEntryExists(relatedChatId, notifiableUserId)
+
+            when {
+                chatEntryExists -> return@transaction TranslateForMeRequestResult.ALREADY_LISTENING
+                !userExists -> return@transaction TranslateForMeRequestResult.UNKNOWN_USER
+            }
+
             ChatMemberTable.insert {
                 it[ChatMemberTable.chatId] = chatId.chatId.long
-                it[ChatMemberTable.notifiableMemberId] = userId.id.chatId.long
+                it[ChatMemberTable.notifiableMemberId] = notifiableUserId
             }
+
+            TranslateForMeRequestResult.SUCCESS
         }
 
-        reply(message, "Got it!")
+        val response = when (result) {
+            TranslateForMeRequestResult.SUCCESS -> "Got it!"
+            TranslateForMeRequestResult.ALREADY_LISTENING -> "Yep, you're already subscribed :)"
+            TranslateForMeRequestResult.UNKNOWN_USER -> "First, send me your timezone in DM, then repeat the request :)"
+        }
+        reply(message, response)
     }
 
     onCommand("stop_translating_time_for_me", initialFilter = { it.chat !is PrivateChat }) { message ->
@@ -110,16 +167,35 @@ fun BehaviourContext.configurePublicChats() {
         val userId = message.from ?: return@onCommand
         val chatId = message.chat.id
 
-        transaction {
-            ChatMemberTable.deleteWhere {
-                (ChatMemberTable.chatId eq chatId.chatId.long) and (ChatMemberTable.notifiableMemberId eq userId.id.chatId.long)
+        val result = transaction {
+            val relatedChatId = chatId.chatId.long
+            val notifiableUserId = userId.id.chatId.long
+
+            val userExists = userExists(notifiableUserId)
+            val chatEntryExists = chatEntryExists(relatedChatId, notifiableUserId)
+
+            when {
+                !userExists -> return@transaction StopTranslatingForMeRequestResult.UNKNOWN_USER
+                !chatEntryExists -> return@transaction StopTranslatingForMeRequestResult.NOT_LISTENING
             }
+
+            ChatMemberTable.deleteWhere {
+                (ChatMemberTable.chatId eq relatedChatId) and (ChatMemberTable.notifiableMemberId eq notifiableUserId)
+            }
+
+            StopTranslatingForMeRequestResult.SUCCESS
         }
 
-        reply(message, "Done!")
+        val response = when (result) {
+            StopTranslatingForMeRequestResult.SUCCESS -> "Done!"
+            StopTranslatingForMeRequestResult.UNKNOWN_USER -> "I don't even know you :)"
+            StopTranslatingForMeRequestResult.NOT_LISTENING -> "You aren't subscribed to anything :)"
+        }
+        reply(message, response)
     }
 
-    onContentMessage(initialFilter = { it.chat !is PrivateChat }) { message ->
+    @OptIn(RiskFeature::class)
+    onContentMessage(initialFilter = { it.chat !is PrivateChat && it.text?.isCommand != true }) { message ->
         @OptIn(RiskFeature::class)
         val text = message.text ?: return@onContentMessage
         @OptIn(RiskFeature::class)
