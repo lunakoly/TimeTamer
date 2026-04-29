@@ -31,6 +31,7 @@ class TestParsing {
         "at 7:20".assertEnglish(LocalTime(19, 20))
         "20".assertEnglish(null)
         "at 2:00 am".assertEnglish(LocalTime(2, 0))
+        "at 2.30 p,".assertEnglish(LocalTime(14, 30))
     }
 
     @Test
@@ -40,6 +41,7 @@ class TestParsing {
         "6 вечера".assertRussian(LocalTime(18, 0))
         "2 ночи".assertRussian(LocalTime(2, 0))
         "в 7".assertRussian(LocalTime(19, 0))
+        "в 4.30".assertRussian(LocalTime(16, 30))
         "4".assertRussian(null)
         "утром в 2".assertRussian(LocalTime(2, 0))
         "днем в 3".assertRussian(LocalTime(15, 0))

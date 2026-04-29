@@ -9,7 +9,7 @@ import org.lunakoly.timetamer.parsing.zone
 fun logError(message: String) = null.also { println("Error > $message") }
 
 object RussianTimeFinder : RegexBasedTimeFinder {
-    override val timePattern = """(?:^|[^а-яА-Я0-9])(?:(?:(утром|днем|вечером|ночью)\s+)?(в\s*))?(\d{1,2})(?::(\d{2}))?\s*(утра|дня|вечера|ночи)?(?:$|[^а-яА-Я0-9])"""
+    override val timePattern = """(?:^|[^а-яА-Я0-9])(?:(?:(утром|днем|вечером|ночью)\s+)?(в\s*))?(\d{1,2})(?:[:.](\d{2}))?\s*(утра|дня|вечера|ночи)?(?:$|[^а-яА-Я0-9])"""
         .toRegex(RegexOption.IGNORE_CASE)
 
     override fun parseMatch(match: MatchResult): TimeWithMessage? {
