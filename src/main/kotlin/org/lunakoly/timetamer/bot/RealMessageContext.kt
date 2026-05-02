@@ -18,12 +18,12 @@ import org.lunakoly.timetamer.quote
 
 class RealMessageContext(
     val message: CommonMessage<*>,
-    val user: User,
+    val sender: User,
     val telegramBot: TelegramBot,
 ) : MessageContext() {
     val chat: IdChatIdentifier get() = message.chat.id
 
-    override val userId: Long get() = user.id.chatId.long
+    override val senderId: Long get() = sender.id.chatId.long
     override val chatId: Long get() = chat.chatId.long
 
     override suspend fun reply(
@@ -49,7 +49,7 @@ fun BehaviourContext.createContextFor(message: CommonMessage<*>): RealMessageCon
     @OptIn(RiskFeature::class)
     return RealMessageContext(
         message = message,
-        user = message.from ?: return null,
+        sender = message.from ?: return null,
         telegramBot = this,
     )
 }

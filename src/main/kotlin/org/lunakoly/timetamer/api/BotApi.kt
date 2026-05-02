@@ -42,9 +42,9 @@ class BotApi(val database: Database) {
 
     suspend fun deleteMe(context: MessageContext) {
         val userExists = transaction(database) {
-            val userExists = userExists(context.userId)
+            val userExists = userExists(context.senderId)
             if (userExists) {
-                UserTable.deleteWhere { UserTable.telegramUserId eq context.userId }
+                UserTable.deleteWhere { UserTable.telegramUserId eq context.senderId }
             }
             userExists
         }
@@ -64,7 +64,7 @@ class BotApi(val database: Database) {
 
         transaction(database) {
             UserTable.upsert(UserTable.telegramUserId) {
-                it[UserTable.telegramUserId] = context.userId
+                it[UserTable.telegramUserId] = context.senderId
                 it[UserTable.timezone] = text
             }
         }
@@ -81,7 +81,7 @@ class BotApi(val database: Database) {
     suspend fun translateTimeForMe(context: MessageContext) {
         val result = transaction(database) {
             val relatedChatId = context.chatId
-            val notifiableUserId = context.userId
+            val notifiableUserId = context.senderId
 
             val userExists = userExists(notifiableUserId)
             val chatEntryExists = chatEntryExists(relatedChatId, notifiableUserId)
@@ -116,7 +116,7 @@ class BotApi(val database: Database) {
     suspend fun stopTranslatingTimeForMe(context: MessageContext) {
         val result = transaction(database) {
             val relatedChatId = context.chatId
-            val notifiableUserId = context.userId
+            val notifiableUserId = context.senderId
 
             val userExists = userExists(notifiableUserId)
             val chatEntryExists = chatEntryExists(relatedChatId, notifiableUserId)
@@ -145,7 +145,7 @@ class BotApi(val database: Database) {
         val senderTimeZone = transaction(database) {
             UserTable
                 .select(UserTable.timezone)
-                .where { UserTable.telegramUserId eq context.userId }
+                .where { UserTable.telegramUserId eq context.senderId }
                 .singleOrNull()
                 ?.get(UserTable.timezone)
         }

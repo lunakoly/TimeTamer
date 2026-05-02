@@ -3,7 +3,7 @@ package org.lunakoly.timetamer.test.api
 import dev.inmo.tgbotapi.types.message.ParseMode
 import org.lunakoly.timetamer.api.MessageContext
 
-class TestMessageContext(override val userId: Long, val chat: TestChat) : MessageContext() {
+class TestMessageContext(override val senderId: Long, val chat: TestChat) : MessageContext() {
     override val chatId: Long get() = chat.chatId
 
     override suspend fun reply(text: String, parseMode: ParseMode?, quote: String?) {

@@ -44,13 +44,13 @@ class TestChats {
         bot.onPrivateChatMessage("Europe/Nicosia", user)
 
         transaction(bot.database) {
-            assertTrue(userExists(user.userId))
+            assertTrue(userExists(user.senderId))
         }
 
         bot.deleteMe(user)
 
         transaction(bot.database) {
-            assertFalse(userExists(user.userId))
+            assertFalse(userExists(user.senderId))
         }
     }
 
@@ -59,27 +59,27 @@ class TestChats {
         bot.onPrivateChatMessage("Ha-ha", user)
 
         transaction(bot.database) {
-            assertFalse(userExists(user.userId))
+            assertFalse(userExists(user.senderId))
         }
 
         bot.onPrivateChatMessage("Europe/Nicosia", user)
 
         transaction(bot.database) {
-            val timeZone = userTimezone(user.userId)
+            val timeZone = userTimezone(user.senderId)
             assertEquals("Europe/Nicosia", timeZone)
         }
 
         bot.onPrivateChatMessage("Ha-ha", user)
 
         transaction(bot.database) {
-            val timeZone = userTimezone(user.userId)
+            val timeZone = userTimezone(user.senderId)
             assertEquals("Europe/Nicosia", timeZone)
         }
 
         bot.onPrivateChatMessage("Asia/Tokyo", user)
 
         transaction(bot.database) {
-            val timeZone = userTimezone(user.userId)
+            val timeZone = userTimezone(user.senderId)
             assertEquals("Asia/Tokyo", timeZone)
         }
     }
@@ -89,8 +89,8 @@ class TestChats {
         val groupChat = TestChat(100L)
         val user1GroupContext = groupChat.addUser(1L)
         val user2GroupContext = groupChat.addUser(2L)
-        val user1PrivateContext = TestChat(101L).addUser(user1GroupContext.userId)
-        val user2PrivateContext = TestChat(102L).addUser(user2GroupContext.userId)
+        val user1PrivateContext = TestChat(101L).addUser(user1GroupContext.senderId)
+        val user2PrivateContext = TestChat(102L).addUser(user2GroupContext.senderId)
 
         testBot { bot ->
             bot.onPrivateChatMessage("Europe/Nicosia", user1PrivateContext)
@@ -128,7 +128,7 @@ class TestChats {
     @Test
     fun testOperationsOnMissingUser() = testSingleUser { bot, user ->
         val groupChat = TestChat(100L)
-        val userPrivate = groupChat.addUser(user.userId)
+        val userPrivate = groupChat.addUser(user.senderId)
 
         bot.deleteMe(userPrivate)
 
