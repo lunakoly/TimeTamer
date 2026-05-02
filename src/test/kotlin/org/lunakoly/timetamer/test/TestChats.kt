@@ -9,6 +9,7 @@ import org.lunakoly.timetamer.db.userTimezone
 import org.lunakoly.timetamer.test.api.TestChat
 import org.lunakoly.timetamer.test.api.TestMessageContext
 import org.lunakoly.timetamer.test.api.addUser
+import org.lunakoly.timetamer.test.api.asForwardedFrom
 import kotlin.io.path.createTempDirectory
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -134,5 +135,34 @@ class TestChats {
 
         bot.translateTimeForMe(user)
         bot.stopTranslatingTimeForMe(user)
+    }
+
+    @Test
+    fun testForwarding() {
+        val groupChat = TestChat(100L)
+        val user1GroupContext = groupChat.addUser(1L)
+        val user2GroupContext = groupChat.addUser(2L)
+        val user1PrivateContext = TestChat(101L).addUser(user1GroupContext.senderId)
+        val user2PrivateContext = TestChat(102L).addUser(user2GroupContext.senderId)
+
+        testBot { bot ->
+            bot.onPrivateChatMessage("Europe/Nicosia", user1PrivateContext)
+            bot.onPrivateChatMessage("Asia/Tokyo", user2PrivateContext)
+
+            bot.translateTimeForMe(user1GroupContext)
+            bot.translateTimeForMe(user2GroupContext)
+
+            bot.onGroupChatMessage("at 4", user1GroupContext)
+            assertEquals("at 4", groupChat.messages.last().quote)
+            assertEquals("Europe/Nicosia: 4:00 pm\nAsia/Tokyo: 10:00 pm", groupChat.messages.last().text)
+
+            bot.onGroupChatMessage("at 4", user2GroupContext)
+            assertEquals("at 4", groupChat.messages.last().quote)
+            assertEquals("Europe/Nicosia: 10:00 am\nAsia/Tokyo: 4:00 pm", groupChat.messages.last().text)
+
+            bot.onGroupChatMessage("at 4", user2GroupContext.asForwardedFrom(user1GroupContext.senderId))
+            assertEquals("at 4", groupChat.messages.last().quote)
+            assertEquals("Europe/Nicosia: 4:00 pm\nAsia/Tokyo: 10:00 pm", groupChat.messages.last().text)
+        }
     }
 }

@@ -5,6 +5,7 @@ import dev.inmo.tgbotapi.extensions.api.chat.members.getChatMember
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.utils.extensions.isLeftOrKicked
+import dev.inmo.tgbotapi.extensions.utils.extensions.raw.forward_from
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.IdChatIdentifier
@@ -19,11 +20,13 @@ import org.lunakoly.timetamer.quote
 class RealMessageContext(
     val message: CommonMessage<*>,
     val sender: User,
+    val author: User,
     val telegramBot: TelegramBot,
 ) : MessageContext() {
     val chat: IdChatIdentifier get() = message.chat.id
 
     override val senderId: Long get() = sender.id.chatId.long
+    override val authorId: Long get() = author.id.chatId.long
     override val chatId: Long get() = chat.chatId.long
 
     override suspend fun reply(
@@ -47,9 +50,13 @@ class RealMessageContext(
 
 fun BehaviourContext.createContextFor(message: CommonMessage<*>): RealMessageContext? {
     @OptIn(RiskFeature::class)
+    val sender = message.from ?: return null
+
+    @OptIn(RiskFeature::class)
     return RealMessageContext(
         message = message,
-        sender = message.from ?: return null,
+        sender = sender,
+        author = message.forward_from ?: sender,
         telegramBot = this,
     )
 }

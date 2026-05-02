@@ -145,7 +145,7 @@ class BotApi(val database: Database) {
         val senderTimeZone = transaction(database) {
             UserTable
                 .select(UserTable.timezone)
-                .where { UserTable.telegramUserId eq context.senderId }
+                .where { UserTable.telegramUserId eq context.authorId }
                 .singleOrNull()
                 ?.get(UserTable.timezone)
         }
