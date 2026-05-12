@@ -9,7 +9,7 @@ import org.lunakoly.timetamer.parsing.zone
 fun logError(message: String) = null.also { println("Error > $message") }
 
 object EnglishTimeFinder : RegexBasedTimeFinder {
-    override val timePattern: Regex = """\b(at\s*)?(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm)?\b"""
+    override val timePattern: Regex = """\b((?:at|before|after)\s*)?(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm)?\b"""
         .toRegex(RegexOption.IGNORE_CASE)
 
     override fun parseMatch(match: MatchResult): TimeWithMessage? {
